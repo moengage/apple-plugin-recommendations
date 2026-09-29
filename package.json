@@ -1,0 +1,14 @@
+{
+  "name": "MoEngagePluginRecommendations",
+  "postBuild": "Utilities/post_build.rb",
+  "sdkVerMin": "11.03.0",
+  "pluginbaseVerMin": "7.02.0",
+  "packages": [
+    {
+      "name": "MoEngagePluginRecommendations",
+      "version": "1.0.0",
+      "changelog": "CHANGELOG.md",
+      "tagPrefix": "pluginRecommendations-"
+    }
+  ]
+}
