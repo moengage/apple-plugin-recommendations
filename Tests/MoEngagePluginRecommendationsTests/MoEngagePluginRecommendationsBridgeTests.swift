@@ -39,9 +39,13 @@ struct MoEngagePluginRecommendationsBridgeTests {
         return try #require(result)
     }
 
-    /// The `error` block of a failure payload: `{ code, message }`.
+    /// The `data` block of a failure payload: `{ reason, message }`, or nil for a success payload.
     func error(in payload: [String: Any]) -> [String: Any]? {
-        return payload["error"] as? [String: Any]
+        guard
+            let data = payload[MoEngagePluginConstants.General.data] as? [String: Any],
+            data["reason"] != nil
+        else { return nil }
+        return data
     }
 
     func appId(in payload: [String: Any]) -> String? {
@@ -54,8 +58,8 @@ struct MoEngagePluginRecommendationsBridgeTests {
         let result = try fetchRecommendations([:])
 
         #expect(mockHandler.fetchRecommendationsCallCount == 0)
-        #expect(result["accountMeta"] == nil)
-        #expect(error(in: result)?["code"] as? String == "UNKNOWN_ERROR")
+        #expect(appId(in: result) == "")
+        #expect(error(in: result)?["reason"] as? String == "UNKNOWN_ERROR")
     }
 
     @Test("Missing recommendationId settles with INVALID_REQUEST without calling native")
@@ -63,7 +67,7 @@ struct MoEngagePluginRecommendationsBridgeTests {
         let result = try fetchRecommendations(fetchPayload(["itemId": "shirts"]))
 
         #expect(mockHandler.fetchRecommendationsCallCount == 0)
-        #expect(error(in: result)?["code"] as? String == "INVALID_REQUEST")
+        #expect(error(in: result)?["reason"] as? String == "INVALID_REQUEST")
         #expect(appId(in: result) == appId)
     }
 
@@ -74,7 +78,7 @@ struct MoEngagePluginRecommendationsBridgeTests {
         ])
 
         #expect(mockHandler.fetchRecommendationsCallCount == 0)
-        #expect(error(in: result)?["code"] as? String == "INVALID_REQUEST")
+        #expect(error(in: result)?["reason"] as? String == "INVALID_REQUEST")
     }
 
     @Test("Input is passed to native with duplicate included fields dropped")
@@ -145,7 +149,7 @@ struct MoEngagePluginRecommendationsBridgeTests {
         #expect((data["items"] as? [Any])?.isEmpty == true)
     }
 
-    @Test("Native failure is reported as { accountMeta, error: { code, message } }")
+    @Test("Native failure is reported as { accountMeta, data: { reason, message } }")
     func moduleFailure() throws {
         mockHandler.result = .failure(
             MoEngageRequestFailure(
@@ -156,10 +160,9 @@ struct MoEngagePluginRecommendationsBridgeTests {
 
         let result = try fetchRecommendations(fetchPayload(["recommendationId": "clothing"]))
 
-        #expect(error(in: result)?["code"] as? String == "RATE_LIMIT_EXCEEDED")
+        #expect(error(in: result)?["reason"] as? String == "RATE_LIMIT_EXCEEDED")
         #expect(error(in: result)?["message"] as? String == "Rate limit exceeded")
         #expect(appId(in: result) == appId)
-        #expect(result["data"] == nil)
         #expect(JSONSerialization.isValidJSONObject(result))
     }
 }

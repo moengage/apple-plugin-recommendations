@@ -52,7 +52,7 @@ import MoEngageRecommendations
     ///
     /// The completion handler is always invoked, exactly once. On success the payload follows
     /// `nativeToHybrid/recommendations/fetchRecommendations.json`; on failure it is
-    /// `{ accountMeta, error: { code, message } }`, as in the personalize plugin.
+    /// `{ accountMeta, data: { reason, message } }`.
     ///
     /// - Parameters:
     ///   - payload: Payload following `hybridToNative/recommendations/fetchRecommendations.json`.
@@ -68,7 +68,7 @@ import MoEngageRecommendations
             completionHandler(
                 MoEngagePluginRecommendationsUtil.buildHybridErrorPayload(
                     forIdentifier: nil,
-                    code: MoEngagePluginRecommendationsConstants.FailureReason.unknownError,
+                    reason: MoEngagePluginRecommendationsConstants.FailureReason.unknownError,
                     message: "Couldn't find app identifier in payload"
                 )
             )
@@ -109,7 +109,7 @@ import MoEngageRecommendations
             completionHandler(
                 MoEngagePluginRecommendationsUtil.buildHybridErrorPayload(
                     forIdentifier: identifier,
-                    code: MoEngagePluginRecommendationsConstants.FailureReason.invalidRequest,
+                    reason: MoEngagePluginRecommendationsConstants.FailureReason.invalidRequest,
                     message: "\(error)"
                 )
             )

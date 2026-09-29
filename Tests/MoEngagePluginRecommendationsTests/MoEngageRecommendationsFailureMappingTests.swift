@@ -74,6 +74,6 @@ struct MoEngageRecommendationsFailureMappingTests {
 }
 
 private extension Dictionary where Key == String, Value == Any {
-    var errorCode: String? { (self["error"] as? [String: Any])?["code"] as? String }
-    var errorMessage: String? { (self["error"] as? [String: Any])?["message"] as? String }
+    var errorCode: String? { (self["data"] as? [String: Any])?["reason"] as? String }
+    var errorMessage: String? { (self["data"] as? [String: Any])?["message"] as? String }
 }

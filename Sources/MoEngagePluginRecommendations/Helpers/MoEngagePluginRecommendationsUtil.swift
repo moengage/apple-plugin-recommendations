@@ -21,24 +21,20 @@ enum MoEngagePluginRecommendationsUtil {
         ]
     }
 
-    /// Builds the failure payload: `{ accountMeta, error: { code, message } }`.
-    /// `accountMeta` is omitted when the app identifier could not be read.
+    /// Builds the failure payload: `{ accountMeta, data: { reason, message } }`.
+    /// `accountMeta.appId` is empty when the app identifier could not be read.
     static func buildHybridErrorPayload(
         forIdentifier identifier: String?,
-        code: String,
+        reason: String,
         message: String
     ) -> [String: Any] {
-        var payload: [String: Any] = [
-            MoEngagePluginRecommendationsConstants.error: [
-                MoEngagePluginRecommendationsConstants.code: code,
+        return buildHybridPayload(
+            forIdentifier: identifier ?? "",
+            containingData: [
+                MoEngagePluginRecommendationsConstants.reason: reason,
                 MoEngagePluginRecommendationsConstants.message: message
             ]
-        ]
-        if let identifier {
-            payload[MoEngagePluginConstants.General.accountMeta] =
-                MoEngagePluginUtils.createAccountPayload(identifier: identifier)
-        }
-        return payload
+        )
     }
 
     static func getData<T>(

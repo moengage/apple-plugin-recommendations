@@ -9,14 +9,14 @@ import MoEngageCore
 import MoEngageRecommendations
 
 extension MoEngageRequestFailure {
-    /// Builds the hybrid failure payload: `{ accountMeta, error: { code, message } }`.
+    /// Builds the hybrid failure payload: `{ accountMeta, data: { reason, message } }`.
     ///
     /// Recommendations specific failures carry a `moduleCode`; failures raised before the
     /// module is reached only carry the shared `code`.
     func toHybridPayload(forIdentifier identifier: String) -> [String: Any] {
         return MoEngagePluginRecommendationsUtil.buildHybridErrorPayload(
             forIdentifier: identifier,
-            code: Self.hybridReason(for: self.reason),
+            reason: Self.hybridReason(for: self.reason),
             message: self.message.isEmpty ? "\(self.reason)" : self.message
         )
     }

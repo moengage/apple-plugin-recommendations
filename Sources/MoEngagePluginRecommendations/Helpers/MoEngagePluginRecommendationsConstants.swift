@@ -15,9 +15,8 @@ enum MoEngagePluginRecommendationsConstants {
     static let includedFields = "includedFields"
     static let items = "items"
 
-    // Failure payload keys, matching the personalize plugin's error payload.
-    static let error = "error"
-    static let code = "code"
+    // Failure payload keys: `{ accountMeta, data: { reason, message } }`.
+    static let reason = "reason"
     static let message = "message"
 
     /// Failure reasons reported to the hybrid layer. Values must match
