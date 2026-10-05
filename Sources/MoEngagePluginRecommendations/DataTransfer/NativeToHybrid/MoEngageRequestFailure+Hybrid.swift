@@ -7,6 +7,7 @@
 
 import MoEngageCore
 import MoEngageRecommendations
+import MoEngagePluginBase
 
 extension MoEngageRequestFailure {
     /// Builds the hybrid failure payload: `{ accountMeta, data: { reason, message } }`.
@@ -27,7 +28,7 @@ extension MoEngageRequestFailure {
            let moduleCode = MoEngageRecommendationsRequestFailureReason.ModuleCode(rawValue: rawModuleCode) {
             return hybridReason(forModuleCode: moduleCode)
         }
-        return hybridReason(forSharedCode: reason.code)
+        return MoEngagePluginUtils.hybridReason(forSharedCode: reason.code)
     }
 
     private static func hybridReason(
@@ -44,29 +45,9 @@ extension MoEngageRequestFailure {
         case .internalServerError:
             return FailureReason.internalServerError
         case .unknownError:
-            return FailureReason.unknownError
+            return MoEngagePluginConstants.FailureReason.unknownError
         @unknown default:
-            return FailureReason.unknownError
-        }
-    }
-
-    private static func hybridReason(forSharedCode code: MoEngageRequestFailureReason.Code) -> String {
-        typealias FailureReason = MoEngagePluginRecommendationsConstants.FailureReason
-        switch code {
-        case .sdkNotInitialized:
-            return FailureReason.sdkState
-        case .featureDisabled:
-            return FailureReason.featureDisabled
-        case .networkError:
-            return FailureReason.networkError
-        case .parseError:
-            return FailureReason.parseError
-        case .invalidParameters:
-            return FailureReason.invalidRequest
-        case .serverError, .authenticationFailed, .unknownError, .requiredPermissionMissing, .cancelled:
-            return FailureReason.unknownError
-        @unknown default:
-            return FailureReason.unknownError
+            return MoEngagePluginConstants.FailureReason.unknownError
         }
     }
 }

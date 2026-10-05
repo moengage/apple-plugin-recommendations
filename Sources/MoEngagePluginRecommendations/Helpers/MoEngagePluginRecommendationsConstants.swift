@@ -19,17 +19,13 @@ enum MoEngagePluginRecommendationsConstants {
     static let reason = "reason"
     static let message = "message"
 
-    /// Failure reasons reported to the hybrid layer. Values must match
+    /// Recommendations specific failure reasons reported to the hybrid layer. Common reasons
+    /// come from `MoEngagePluginConstants.FailureReason`. Values must match
     /// `RecommendationsFailureReason` in the hybrid platform interfaces.
     enum FailureReason {
         static let invalidRequest = "INVALID_REQUEST"
         static let payloadTooLarge = "PAYLOAD_TOO_LARGE"
         static let rateLimitExceeded = "RATE_LIMIT_EXCEEDED"
         static let internalServerError = "INTERNAL_SERVER_ERROR"
-        static let featureDisabled = "FEATURE_DISABLED"
-        static let sdkState = "SDK_STATE"
-        static let networkError = "NETWORK_ERROR"
-        static let parseError = "PARSE_ERROR"
-        static let unknownError = "UNKNOWN_ERROR"
     }
 }

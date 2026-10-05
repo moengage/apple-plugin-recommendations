@@ -52,4 +52,13 @@ enum MoEngagePluginRecommendationsUtil {
         }
         return result
     }
+
+    /// Reads an optional key: `nil` when absent or `null`, throws when present with the wrong type.
+    static func decodeOptional<T>(_ key: String, from data: [String: Any]) throws -> T? {
+        guard let value = data[key], !(value is NSNull) else { return nil }
+        guard let result = value as? T else {
+            throw MoEngagePluginRecommendationsDecodingError(key: key, data: data)
+        }
+        return result
+    }
 }

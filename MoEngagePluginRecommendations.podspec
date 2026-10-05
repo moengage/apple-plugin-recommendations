@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
 
   s.frameworks = 'UIKit', 'Foundation'
   s.dependency 'MoEngagePluginBase', config.pluginbaseVerMin
-  s.dependency 'MoEngageRecommendations'
+  s.dependency 'MoEngage-iOS-SDK/Recommendations'
 
   test_file_glob = "Tests/#{s.name}Tests/**/*.{swift}"
   s.test_spec 'Tests' do |ts|

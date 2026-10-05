@@ -20,15 +20,18 @@ struct MoEngageRecommendationsFetchData {
 
     /// Blank values are passed through as-is; the native SDK owns their validation
     /// (a blank `recommendationId` rejects with `invalidRequest`).
+    ///
+    /// Optional keys default only when absent; a present value of the wrong type throws.
     static func decodeFromHybrid(_ data: [String: Any]) throws -> Self {
         guard let recommendationId = data[HybridKeys.recommendationId] as? String else {
             throw MoEngagePluginRecommendationsDecodingError(key: HybridKeys.recommendationId, data: data)
         }
 
-        let includedFields = data[HybridKeys.includedFields] as? [String] ?? []
+        let itemId: String = try MoEngagePluginRecommendationsUtil.decodeOptional(HybridKeys.itemId, from: data) ?? ""
+        let includedFields: [String] = try MoEngagePluginRecommendationsUtil.decodeOptional(HybridKeys.includedFields, from: data) ?? []
         return self.init(
             recommendationId: recommendationId,
-            itemId: data[HybridKeys.itemId] as? String ?? "",
+            itemId: itemId,
             includedFields: Set(includedFields)
         )
     }

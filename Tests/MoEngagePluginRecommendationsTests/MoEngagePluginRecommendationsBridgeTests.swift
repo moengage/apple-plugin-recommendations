@@ -81,6 +81,53 @@ struct MoEngagePluginRecommendationsBridgeTests {
         #expect(error(in: result)?["reason"] as? String == "INVALID_REQUEST")
     }
 
+    func expectInvalidRequestWithoutNativeCall(for data: [String: Any]) throws {
+        let result = try fetchRecommendations(fetchPayload(data))
+
+        #expect(mockHandler.fetchRecommendationsCallCount == 0)
+        #expect(error(in: result)?["reason"] as? String == "INVALID_REQUEST")
+        #expect(appId(in: result) == appId)
+    }
+
+    @Test("Non-string recommendationId settles with INVALID_REQUEST without calling native")
+    func wrongTypeRecommendationId() throws {
+        try expectInvalidRequestWithoutNativeCall(for: ["recommendationId": 1])
+    }
+
+    @Test("Non-string itemId settles with INVALID_REQUEST without calling native")
+    func wrongTypeItemId() throws {
+        try expectInvalidRequestWithoutNativeCall(for: ["recommendationId": "clothing", "itemId": 1])
+    }
+
+    @Test("Non-string element in includedFields settles with INVALID_REQUEST without calling native")
+    func wrongTypeIncludedFieldsElement() throws {
+        try expectInvalidRequestWithoutNativeCall(
+            for: ["recommendationId": "clothing", "includedFields": ["size", 1] as [Any]]
+        )
+    }
+
+    @Test("Non-array includedFields settles with INVALID_REQUEST without calling native")
+    func wrongTypeIncludedFields() throws {
+        try expectInvalidRequestWithoutNativeCall(
+            for: ["recommendationId": "clothing", "includedFields": "size"]
+        )
+    }
+
+    @Test("Null optional input defaults to empty values")
+    func nullOptionalInput() throws {
+        _ = try fetchRecommendations(
+            fetchPayload([
+                "recommendationId": "clothing",
+                "itemId": NSNull(),
+                "includedFields": NSNull()
+            ])
+        )
+
+        let input = try #require(mockHandler.lastInput)
+        #expect(input.itemId == "")
+        #expect(input.includedFields.isEmpty)
+    }
+
     @Test("Input is passed to native with duplicate included fields dropped")
     func passesInputToNative() throws {
         _ = try fetchRecommendations(
@@ -162,6 +209,23 @@ struct MoEngagePluginRecommendationsBridgeTests {
 
         #expect(error(in: result)?["reason"] as? String == "RATE_LIMIT_EXCEEDED")
         #expect(error(in: result)?["message"] as? String == "Rate limit exceeded")
+        #expect(appId(in: result) == appId)
+        #expect(JSONSerialization.isValidJSONObject(result))
+    }
+
+    @Test("Shared code failure is reported through the bridge")
+    func sharedCodeFailure() throws {
+        mockHandler.result = .failure(
+            MoEngageRequestFailure(
+                reason: MoEngageRecommendationsRequestFailureReason(code: .sdkNotInitialized),
+                message: "SDK is not initialized"
+            )
+        )
+
+        let result = try fetchRecommendations(fetchPayload(["recommendationId": "clothing"]))
+
+        #expect(error(in: result)?["reason"] as? String == "SDK_STATE")
+        #expect(error(in: result)?["message"] as? String == "SDK is not initialized")
         #expect(appId(in: result) == appId)
         #expect(JSONSerialization.isValidJSONObject(result))
     }

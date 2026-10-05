@@ -68,7 +68,7 @@ import MoEngageRecommendations
             completionHandler(
                 MoEngagePluginRecommendationsUtil.buildHybridErrorPayload(
                     forIdentifier: nil,
-                    reason: MoEngagePluginRecommendationsConstants.FailureReason.unknownError,
+                    reason: MoEngagePluginConstants.FailureReason.unknownError,
                     message: "Couldn't find app identifier in payload"
                 )
             )
@@ -91,7 +91,10 @@ import MoEngageRecommendations
                         forIdentifier: identifier,
                         containingData: recommendedItems.encodeForHybrid()
                     )
-                    self.log("Fetch Recommendations response - \(result)", forWorkspaceId: identifier)
+                    self.log(
+                        "Fetch Recommendations response - \(recommendedItems.items.count) item(s)",
+                        forWorkspaceId: identifier
+                    )
                     completionHandler(result)
                 },
                 onFailure: { failure in

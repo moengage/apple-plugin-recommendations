@@ -40,9 +40,9 @@ struct MoEngageRecommendationsFailureMappingTests {
             (.featureDisabled, "FEATURE_DISABLED"),
             (.networkError, "NETWORK_ERROR"),
             (.parseError, "PARSE_ERROR"),
-            (.invalidParameters, "INVALID_REQUEST"),
-            (.serverError, "UNKNOWN_ERROR"),
-            (.authenticationFailed, "UNKNOWN_ERROR"),
+            (.invalidParameters, "INVALID_PARAMETERS"),
+            (.serverError, "SERVER_ERROR"),
+            (.authenticationFailed, "AUTHENTICATION_FAILED"),
             (.requiredPermissionMissing, "UNKNOWN_ERROR"),
             (.cancelled, "UNKNOWN_ERROR"),
             (.unknownError, "UNKNOWN_ERROR")
@@ -69,7 +69,9 @@ struct MoEngageRecommendationsFailureMappingTests {
         let failure = MoEngageRequestFailure(
             reason: MoEngageRecommendationsRequestFailureReason(moduleCode: .invalidRequest)
         )
-        #expect(failure.toHybridPayload(forIdentifier: "some_id").errorMessage?.isEmpty == false)
+        let message = failure.toHybridPayload(forIdentifier: "some_id").errorMessage
+        #expect(message == failure.reason.description)
+        #expect(message?.hasPrefix("MoEngageRecommendationsRequestFailureReason(moduleCode:") == true)
     }
 }
 
