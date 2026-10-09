@@ -43,6 +43,7 @@ struct MoEngagePluginRecommendationsSDKAdapterTests {
 
     @Test("Unregistered workspace rejects through onFailure with sdkNotInitialized")
     func unregisteredWorkspaceFails() async throws {
+        MoEngageSDKCore.sharedInstance.disableIntegrationValidator()
         let handler: MoEngagePluginRecommendationsBridgeHandler = MoEngageSDKRecommendations.sharedInstance
 
         let outcome = await withCheckedContinuation { continuation in
