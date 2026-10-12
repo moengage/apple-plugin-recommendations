@@ -1,0 +1,53 @@
+//
+//  MoEngageRequestFailure+Hybrid.swift
+//  MoEngagePluginRecommendations
+//
+//  Created by Rakshitha on 24/09/26.
+//
+
+import MoEngageCore
+import MoEngageRecommendations
+import MoEngagePluginBase
+
+extension MoEngageRequestFailure {
+    /// Builds the hybrid failure payload: `{ accountMeta, data: { reason, message } }`.
+    ///
+    /// Recommendations specific failures carry a `moduleCode`; failures raised before the
+    /// module is reached only carry the shared `code`.
+    func toHybridPayload(forIdentifier identifier: String) -> [String: Any] {
+        return MoEngagePluginRecommendationsUtil.buildHybridErrorPayload(
+            forIdentifier: identifier,
+            reason: Self.hybridReason(for: self.reason),
+            message: self.message.isEmpty ? "\(self.reason)" : self.message
+        )
+    }
+
+    static func hybridReason(for reason: MoEngageRequestFailureReason) -> String {
+        if let reason = reason as? MoEngageRecommendationsRequestFailureReason,
+           let rawModuleCode = reason.moduleCode?.intValue,
+           let moduleCode = MoEngageRecommendationsRequestFailureReason.ModuleCode(rawValue: rawModuleCode) {
+            return hybridReason(forModuleCode: moduleCode)
+        }
+        return MoEngagePluginUtils.hybridReason(forSharedCode: reason.code)
+    }
+
+    private static func hybridReason(
+        forModuleCode code: MoEngageRecommendationsRequestFailureReason.ModuleCode
+    ) -> String {
+        typealias FailureReason = MoEngagePluginRecommendationsConstants.FailureReason
+        switch code {
+        case .invalidRequest:
+            return FailureReason.invalidRequest
+        case .payloadTooLarge:
+            return FailureReason.payloadTooLarge
+        case .rateLimitExceeded:
+            return FailureReason.rateLimitExceeded
+        case .internalServerError:
+            return FailureReason.internalServerError
+        case .unknownError:
+            return MoEngagePluginConstants.FailureReason.unknownError
+        @unknown default:
+            return MoEngagePluginConstants.FailureReason.unknownError
+        }
+    }
+}
