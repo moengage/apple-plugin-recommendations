@@ -1,5 +1,7 @@
-# Release Date
+# 16-10-2026
 
-## Release Version
+## 1.0.0
 
-- [major] Added support for fetching recommendations
+- Updated MoEngage-iOS-SDK to 11.04.0
+- Updated MoEngagePluginBase to 7.03.0
+- Added support for fetching recommendations
